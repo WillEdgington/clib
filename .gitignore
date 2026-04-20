@@ -5,3 +5,7 @@
 
 # Dependency/Environment folders
 venv/
+
+# compiled test binaries
+test_hashmap
+test_vector

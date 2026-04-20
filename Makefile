@@ -9,9 +9,9 @@ SRC=$(wildcard src/*.c)
 OBJ=$(SRC:.c=.o)
 
 TESTSRC = $(wildcard tests/test_*.c)
-TESTBIN = $(TESTSRC:tests/%.c=%)
+TESTBIN = $(TESTSRC:.c=)
 
-DEPS = $(OBJ:.o=.d) $(TESTSRC:tests/%.c=%.d)
+DEPS = $(OBJ:.o=.d) $(TESTSRC:.c=.d)
 
 .PHONY: all clean test debug
 
@@ -33,10 +33,10 @@ test: LDFLAGS += $(DEVFLAGS)
 test: $(TESTBIN)
 		@for bin in $(TESTBIN); do ./$$bin; done
 
-%: tests/%.c $(LIBNAME)
-		$(CC) $(CFLAGS) $< -L. -lclib $(LDFLAGS) -o $@
+tests/%: tests/%.c $(LIBNAME)
+	$(CC) $(CFLAGS) $< -L. -lclib $(LDFLAGS) -o $@
 
 -include $(DEPS)
 
 clean:
-		rm -f src/*.o src/*.d $(LIBNAME) $(TESTBIN)
+	rm -f src/*.o $(LIBNAME) $(TESTBIN) $(DEPS)

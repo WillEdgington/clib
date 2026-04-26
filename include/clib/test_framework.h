@@ -14,7 +14,7 @@ static int tests_failed = 0;
 
 #define _ASSERT_FAIL(msg, ...)                                                 \
   do {                                                                         \
-    printf(COLOR_RED " [FAIL] " COLOR_RESET);                                  \
+    printf(COLOR_RED "  [FAIL] " COLOR_RESET);                                 \
     printf(msg, ##__VA_ARGS__);                                                \
     printf("\n         Line %d in %s\n", __LINE__, __FILE__);                  \
     tests_failed++;                                                            \

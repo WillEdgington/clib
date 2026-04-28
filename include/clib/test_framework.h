@@ -62,6 +62,16 @@ static int tests_failed = 0;
     }                                                                          \
   } while (0)
 
+#define ASSERT_PTR_NULL(ptr, message)                                          \
+  do {                                                                         \
+    tests_run++;                                                               \
+    if ((ptr) == NULL) {                                                       \
+      printf(COLOR_GREEN "  [PASS] " COLOR_RESET "%s\n", message);             \
+    } else {                                                                   \
+      _ASSERT_FAIL("%s (Pointer is not NULL)", message);                       \
+    }                                                                          \
+  } while (0)
+
 static inline void test_summary() {
   printf("\n---------------------------\n");
   if (tests_failed == 0) {

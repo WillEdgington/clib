@@ -1,5 +1,7 @@
-#include "../include/clib/hashmap.h"
-#include "../include/clib/arena.h"
+#include "clib/hashmap.h"
+#include "clib/arena.h"
+#include "clib/iter.h"
+
 #include <stddef.h>
 #include <stdlib.h>
 #include <string.h>
@@ -151,4 +153,34 @@ size_t hashmap_count(const HashMap *map) { return map->count; }
 void hashmap_free(HashMap *map) {
   free(map->buckets);
   map->buckets = NULL;
+}
+
+int hashmap_iter_next(Iter *iter) {
+  HashMap *map = (HashMap *)iter->collection;
+  Entry *cur = (Entry *)iter->state;
+
+  if (cur != NULL && cur->next != NULL) {
+    iter->state = cur->next;
+    iter->current.key = cur->next->key;
+    iter->current.value = cur->next->value;
+    return 0;
+  }
+
+  while (iter->index < map->capacity) {
+    Entry *entry = map->buckets[iter->index];
+    iter->index++;
+
+    if (entry != NULL) {
+      iter->state = entry;
+      iter->current.key = entry->key;
+      iter->current.value = entry->value;
+      return 0;
+    }
+  }
+  return 1;
+}
+
+Iter hashmap_iter(HashMap *map) {
+  return (Iter){
+      .collection = map, .index = 0, .state = NULL, .next = hashmap_iter_next};
 }

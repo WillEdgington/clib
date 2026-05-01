@@ -1,4 +1,8 @@
+#ifndef HASHMAP_H
+#define HASHMAP_H
+
 #include "arena.h"
+#include "iter.h"
 #include <stddef.h>
 
 typedef struct Entry {
@@ -28,3 +32,7 @@ void *hashmap_get(const HashMap *map, const void *key);
 int hashmap_remove(HashMap *map, const void *key);
 size_t hashmap_count(const HashMap *map);
 void hashmap_free(HashMap *map);
+int hashmap_iter_next(Iter *iter);
+Iter hashmap_iter(HashMap *map);
+
+#endif

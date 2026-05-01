@@ -1,7 +1,8 @@
+#include "clib/iter.h"
 #include "clib/test_framework.h"
 #include "clib/vector.h"
 
-int main() {
+static void test_vector_ints() {
   Vector v;
   int val1 = 100;
   int val2 = 200;
@@ -31,6 +32,61 @@ int main() {
                 "Pop should return -1 when vector is empty (error)");
 
   vector_free(&v);
+}
+
+static void test_vector_strings() {
+  Vector v;
+  vector_init(&v, sizeof(char *));
+
+  const char *s1 = "Hello";
+  const char *s2 = "World";
+
+  vector_push(&v, &s1);
+  vector_push(&v, &s2);
+
+  char *popped;
+  vector_pop(&v, &popped);
+  ASSERT_STR_EQ(popped, s2, "Vector should handle string pointers (pop)");
+  vector_free(&v);
+}
+
+static void test_vector_iter() {
+  Vector v;
+  vector_init(&v, sizeof(int));
+  Iter pre_it = vector_iter(&v);
+
+  for (int i = 0; i < 10; i++) {
+    vector_push(&v, &i);
+  }
+
+  Iter it = vector_iter(&v);
+  int count = 0, correct = 0;
+  while (it.next(&it) == 0) {
+    int val = *(int *)it.current.value;
+    if (val == count)
+      correct++;
+    count++;
+  }
+
+  int pre_count = 0;
+  while (pre_it.next(&pre_it) == 0)
+    pre_count++;
+
+  ASSERT_INT_EQ(count, (int)v.count,
+                "Iterator should iterate through the whole vector");
+  ASSERT_INT_EQ(
+      correct, (int)v.count,
+      "All items traversed by the iterator should match the expected");
+  ASSERT_INT_EQ(pre_count, (int)v.count,
+                "Iterator should iterate through items pushed after init");
+  vector_free(&v);
+}
+
+int main() {
+  printf("\nTesting: tests/test_vector.c...\n");
+  test_vector_ints();
+  test_vector_strings();
+  test_vector_iter();
   test_summary();
   return tests_failed > 0 ? 1 : 0;
 }

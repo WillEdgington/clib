@@ -2,7 +2,7 @@
 #include "clib/test_framework.h"
 #include <stdint.h>
 
-int main() {
+static void test_arena() {
   Arena a;
   // Initialize with a small slab size to force chaining easily
   arena_init(&a, 64);
@@ -35,6 +35,11 @@ int main() {
          "Current region should be reset to head after reset");
 
   arena_free(&a);
+}
+
+int main() {
+  printf("\nTesting: %s...\n", __FILE__);
+  test_arena();
   test_summary();
   return tests_failed > 0 ? 1 : 0;
 }

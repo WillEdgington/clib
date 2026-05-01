@@ -83,7 +83,7 @@ static void test_vector_iter() {
 }
 
 int main() {
-  printf("\nTesting: tests/test_vector.c...\n");
+  printf("\nTesting: %s...\n", __FILE__);
   test_vector_ints();
   test_vector_strings();
   test_vector_iter();

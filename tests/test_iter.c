@@ -28,7 +28,7 @@ static void test_generic_contract() {
 }
 
 int main() {
-  printf("\nTesting: tests/test_iter.c...\n");
+  printf("\nTesting: %s...\n", __FILE__);
   test_generic_contract();
   test_summary();
   return tests_failed > 0 ? 1 : 0;

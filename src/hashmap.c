@@ -86,8 +86,8 @@ int hashmap_init(HashMap *map, size_t key_size, size_t val_size, Arena *arena) {
 }
 
 void hashmap_set_functions(HashMap *map, HashFn hash, CompareFn compare) {
-  map->hash = hash;
-  map->compare = compare;
+  map->hash = hash == NULL ? default_hash : hash;
+  map->compare = compare == NULL ? default_compare : compare;
 }
 
 void *hashmap_get(const HashMap *map, const void *key) {

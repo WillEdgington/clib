@@ -15,6 +15,8 @@ static Region *region_create(size_t capacity) {
 
 int arena_init(Arena *a, size_t slab_size) {
   a->slab_size = slab_size;
+  a->head = NULL;
+  a->current = NULL;
   return 0;
 }
 

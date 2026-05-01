@@ -2,6 +2,7 @@
 #define OHASHMAP_H
 
 #include "arena.h"
+#include "iter.h"
 
 #include <stdlib.h>
 
@@ -35,5 +36,7 @@ void *ohashmap_get(OHashMap *map, const void *key);
 int ohashmap_remove(OHashMap *map, const void *key);
 size_t ohashmap_count(const OHashMap *map);
 void ohashmap_free(OHashMap *map);
+int ohashmap_iter_next(Iter *iter);
+Iter ohashmap_iter(OHashMap *map);
 
 #endif

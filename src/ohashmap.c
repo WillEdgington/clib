@@ -1,5 +1,6 @@
 #include "clib/ohashmap.h"
 #include "clib/arena.h"
+#include "clib/iter.h"
 
 #include <stddef.h>
 #include <string.h>
@@ -67,8 +68,8 @@ int ohashmap_init(OHashMap *map, size_t key_size, size_t val_size,
 }
 
 void ohashmap_set_functions(OHashMap *map, HashFn hash, CompareFn compare) {
-  map->hash = hash;
-  map->compare = compare;
+  map->hash = hash == NULL ? default_hash : hash;
+  map->compare = compare == NULL ? default_compare : compare;
 }
 
 int ohashmap_put(OHashMap *map, const void *key, const void *value) {
@@ -130,4 +131,23 @@ size_t ohashmap_count(const OHashMap *map) { return map->count; }
 void ohashmap_free(OHashMap *map) {
   free(map->buckets);
   map->buckets = NULL;
+}
+
+int ohashmap_iter_next(Iter *iter) {
+  OHashMap *map = (OHashMap *)iter->collection;
+
+  while (iter->index < map->capacity) {
+    OEntry entry = map->buckets[iter->index];
+    iter->index++;
+    if (entry.state == SLOT_OCCUPIED) {
+      iter->current.key = entry.key;
+      iter->current.value = entry.value;
+      return 0;
+    }
+  }
+  return 1;
+}
+
+Iter ohashmap_iter(OHashMap *map) {
+  return (Iter){.collection = map, .index = 0, .next = ohashmap_iter_next};
 }

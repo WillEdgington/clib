@@ -1,4 +1,5 @@
-#include "../include/clib/vector.h"
+#include "clib/vector.h"
+#include "clib/iter.h"
 
 #include <stdlib.h>
 #include <string.h>
@@ -54,4 +55,20 @@ int vector_pop(Vector *v, void *ptr) {
     return -1;
   memcpy(ptr, tmp, v->item_size);
   return 0;
+}
+
+int vector_iter_next(Iter *iter) {
+  Vector *vector = (Vector *)iter->collection;
+  if (iter->index >= vector->count) {
+    iter->current.value = NULL;
+    return 1;
+  }
+  iter->current.value =
+      (char *)vector->items + (iter->index * vector->item_size);
+  iter->index++;
+  return 0;
+}
+
+Iter vector_iter(Vector *vector) {
+  return (Iter){.collection = vector, .index = 0, .next = vector_iter_next};
 }

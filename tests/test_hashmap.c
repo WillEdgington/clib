@@ -1,5 +1,6 @@
 #include "clib/arena.h"
 #include "clib/hashmap.h"
+#include "clib/iter.h"
 #include "clib/test_framework.h"
 #include <string.h>
 
@@ -20,12 +21,9 @@ static size_t str_hash(const void *key, size_t key_size) {
   return hash;
 }
 
-int main() {
-  Arena arena;
-  arena_init(&arena, 1024); // 1KB slabs
-
+static void test_hashmap_ints(Arena *arena) {
   HashMap map;
-  hashmap_init(&map, sizeof(int), sizeof(int), &arena);
+  hashmap_init(&map, sizeof(int), sizeof(int), arena);
 
   int key1 = 10, val1 = 100;
   int key2 = 20, val2 = 200;
@@ -51,19 +49,6 @@ int main() {
   ASSERT_PTR_NULL(hashmap_get(&map, &key2), "Key 20 should be gone");
   ASSERT_INT_EQ(hashmap_count(&map), 1, "Count should be 1 after removal");
 
-  // String type (char *) keys (test custom function pointers)
-  HashMap smap;
-  hashmap_init(&smap, sizeof(char *), sizeof(int), &arena);
-  hashmap_set_functions(&smap, str_hash, str_compare);
-
-  const char *s_key = "hello";
-  int s_val = 999;
-  hashmap_put(&smap, &s_key, &s_val);
-
-  int *s_res = (int *)hashmap_get(&smap, &s_key);
-  ASSERT_PTR_NOT_NULL(s_res, "Should find string key 'hello'");
-  ASSERT_INT_EQ(*s_res, 999, "Value should match 999");
-
   // Force a resize by inserting more items than the initial capacity
   // (default 16) * 0.7
   for (int i = 0; i < 20; i++) {
@@ -78,9 +63,69 @@ int main() {
   ASSERT_INT_EQ(*find_val, 10, "Value should be correct after resize");
 
   hashmap_free(&map);
-  hashmap_free(&smap);
-  arena_free(&arena);
+}
 
+static void test_hashmap_strings(Arena *arena) {
+  // String type (char *) keys (test custom function pointers)
+  HashMap map;
+  hashmap_init(&map, sizeof(char *), sizeof(int), arena);
+  hashmap_set_functions(&map, str_hash, str_compare);
+
+  const char *s_key = "hello";
+  int s_val = 999;
+  hashmap_put(&map, &s_key, &s_val);
+
+  int *s_res = (int *)hashmap_get(&map, &s_key);
+  ASSERT_PTR_NOT_NULL(s_res, "Should find string key 'hello'");
+  ASSERT_INT_EQ(*s_res, 999, "Value should match 999");
+  hashmap_free(&map);
+}
+
+static void test_hashmap_iter(Arena *arena) {
+  HashMap map;
+  hashmap_init(&map, sizeof(int), sizeof(int), arena);
+  Iter pre_it = hashmap_iter(&map);
+
+  for (int i = 0; i < 10; i++) {
+    int v = i + 10;
+    hashmap_put(&map, &i, &v);
+  }
+
+  Iter it = hashmap_iter(&map);
+  int count = 0, correct = 0;
+  while (it.next(&it) == 0) {
+    int key = *(int *)it.current.key;
+    int val = *(int *)it.current.value;
+    if (val == *(int *)hashmap_get(&map, &key))
+      correct++;
+    count++;
+  }
+
+  int pre_count = 0;
+  while (pre_it.next(&pre_it) == 0)
+    pre_count++;
+
+  ASSERT_INT_EQ(count, (int)map.count,
+                "Iterator should iterate through the whole vector");
+  ASSERT_INT_EQ(correct, (int)map.count,
+                "All key/value pairs traversed by the iterator should match "
+                "the expected");
+  ASSERT_INT_EQ(
+      pre_count, (int)map.count,
+      "Iterator should iterate through key/value pairs added after init");
+  hashmap_free(&map);
+}
+
+int main() {
+  printf("\nTesting: %s...\n", __FILE__);
+  Arena arena;
+  arena_init(&arena, 1024); // 1KB slabs
+
+  test_hashmap_ints(&arena);
+  test_hashmap_strings(&arena);
+  test_hashmap_iter(&arena);
+
+  arena_free(&arena);
   test_summary();
   return tests_failed > 0 ? 1 : 0;
 }

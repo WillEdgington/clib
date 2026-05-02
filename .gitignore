@@ -12,3 +12,4 @@ test_vector
 test_arena
 test_ohashmap
 test_iter
+test_heap

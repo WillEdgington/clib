@@ -11,9 +11,12 @@ OBJ=$(SRC:.c=.o)
 TESTSRC = $(wildcard tests/test_*.c)
 TESTBIN = $(TESTSRC:.c=)
 
-DEPS = $(OBJ:.o=.d) $(TESTSRC:.c=.d)
+METRICSRCS = $(wildcard metrics/*.c)
+METRICBIN = $(METRICSRCS:.c=)
 
-.PHONY: all clean test debug
+DEPS = $(OBJ:.o=.d) $(TESTSRC:.c=.d) $(METRICSRCS:.c=.d)
+
+.PHONY: all clean test debug metric
 
 all: $(LIBNAME)
 
@@ -28,6 +31,7 @@ $(LIBNAME): $(OBJ)
 src/%.o: src/%.c
 	$(CC) $(CFLAGS) -c -o $@ $<
 
+# make test
 test: CFLAGS += $(DEVFLAGS)
 test: LDFLAGS += $(DEVFLAGS)
 test: $(TESTBIN)
@@ -36,7 +40,15 @@ test: $(TESTBIN)
 tests/%: tests/%.c $(LIBNAME)
 	$(CC) $(CFLAGS) $< -L. -lclib $(LDFLAGS) -o $@
 
+# make metric
+metric: CFLAGS += $(RELFLAGS)
+metric: $(METRICBIN)
+		@for bin in $(METRICBIN); do ./$$bin; done
+
+metrics/%: metrics/%.c $(LIBNAME)
+	$(CC) $(CFLAGS) $< -L. -lclib $(LDFLAGS) -o $@
+
 -include $(DEPS)
 
 clean:
-	rm -f src/*.o $(LIBNAME) $(TESTBIN) $(DEPS)
+	rm -f src/*.o $(LIBNAME) $(TESTBIN) $(METRICBIN) $(DEPS)

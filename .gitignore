@@ -7,9 +7,11 @@
 venv/
 
 # compiled test binaries
-test_hashmap
-test_vector
-test_arena
-test_ohashmap
-test_iter
-test_heap
+tests/*
+!tests/*.c
+!tests/*.h
+
+# compiled metric binaries
+metrics/*
+!metrics/*.c
+!metrics/*.h

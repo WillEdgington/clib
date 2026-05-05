@@ -5,6 +5,8 @@
 #include "iter.h"
 #include <stddef.h>
 
+#define HASHMAP_LOAD_FACTOR 0.7
+
 typedef struct Entry {
   void *key;
   void *value;

@@ -8,7 +8,6 @@
 
 #define FNV_OFFSET 0xcbf29ce484222325ULL
 #define FNV_PRIME 0x100000001b3ULL
-#define LOAD_FACTOR 0.7
 
 // Default hash function using FNV-1a
 // It treats the key as a raw sequence of bytes
@@ -101,7 +100,7 @@ void *hashmap_get(const HashMap *map, const void *key) {
 }
 
 int hashmap_put(HashMap *map, const void *key, const void *value) {
-  if (map->count + 1 > map->capacity * LOAD_FACTOR) {
+  if (map->count + 1 > map->capacity * HASHMAP_LOAD_FACTOR) {
     if (grow_buckets(map) != 0)
       return -1;
   }

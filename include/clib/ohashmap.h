@@ -6,6 +6,8 @@
 
 #include <stdlib.h>
 
+#define OHASHMAP_LOAD_FACTOR 0.7
+
 typedef enum { SLOT_EMPTY = 0, SLOT_OCCUPIED, SLOT_TOMBSTONE } SlotState;
 
 typedef struct {

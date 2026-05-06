@@ -133,6 +133,33 @@ static void test_heap_min_iter() {
   heap_free(&h);
 }
 
+static void test_heap_heapify() {
+  Vector v;
+  Heap h;
+  vector_init(&v, sizeof(int));
+  heap_init(&h, sizeof(int), NULL);
+
+  for (int i = 10; i >= 0; i--) {
+    vector_push(&v, &i);
+  }
+  heap_heapify(&h, &v);
+
+  ASSERT_INT_EQ(*(int *)heap_peek(&h), 0,
+                "Heapify should result in min-value at root (int 0)");
+
+  int out, last = -1, count = 0;
+  while (h.data.count > 0) {
+    heap_pop(&h, &out);
+    if (out >= last)
+      count++;
+    last = out;
+  }
+
+  ASSERT_INT_EQ(count, 11,
+                "Heapified heap should pop elements in non-decreasing order");
+  heap_free(&h);
+}
+
 int main() {
   printf("\nTesting: %s...\n", __FILE__);
 
@@ -141,6 +168,7 @@ int main() {
   test_heap_min_strings();
   test_heap_max_strings();
   test_heap_min_iter();
+  test_heap_heapify();
   test_summary();
 
   return tests_failed > 0 ? 1 : 0;

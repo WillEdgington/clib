@@ -18,6 +18,7 @@ void heap_free(Heap *h);
 int heap_push(Heap *h, const void *value);
 int heap_pop(Heap *h, void *ptr);
 void *heap_peek(Heap *h);
+void heap_heapify(Heap *h, Vector *data);
 int heap_iter_next(Iter *iter);
 Iter heap_iter(Heap *heap);
 

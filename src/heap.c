@@ -102,6 +102,15 @@ void *heap_peek(Heap *h) { return h->data.count > 0 ? h->data.items : NULL; }
 
 void heap_free(Heap *h) { vector_free(&h->data); }
 
+void heap_heapify(Heap *h, Vector *data) {
+  heap_free(h);
+  h->data = *data;
+  if (h->data.count < 2)
+    return;
+  for (int i = (int)(h->data.count >> 1) - 1; i >= 0; i--)
+    sift_down(h, i);
+}
+
 int heap_iter_next(Iter *iter) { return vector_iter_next(iter); }
 
 Iter heap_iter(Heap *heap) { return vector_iter(&heap->data); }

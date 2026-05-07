@@ -75,9 +75,11 @@ static void sift_down(Heap *h, size_t index) {
   }
 }
 
-void heap_init(Heap *h, size_t item_size, HeapCompareFn compare) {
-  vector_init(&h->data, item_size);
+int heap_init(Heap *h, size_t item_size, HeapCompareFn compare) {
+  if (vector_init(&h->data, item_size) == -1)
+    return -1;
   h->compare = compare == NULL ? min_int_cmp : compare;
+  return 0;
 }
 
 int heap_push(Heap *h, const void *value) {

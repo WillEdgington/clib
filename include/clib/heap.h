@@ -12,8 +12,8 @@ typedef struct {
   HeapCompareFn compare;
 } Heap;
 
-// if compare is NULL, the default to int based min heap
-void heap_init(Heap *h, size_t elem_size, HeapCompareFn compare);
+// if compare is NULL, then default to int based min heap
+int heap_init(Heap *h, size_t item_size, HeapCompareFn compare);
 void heap_free(Heap *h);
 int heap_push(Heap *h, const void *value);
 int heap_pop(Heap *h, void *ptr);

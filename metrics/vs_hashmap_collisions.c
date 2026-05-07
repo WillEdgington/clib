@@ -4,6 +4,7 @@
 #include "clib/ohashmap.h"
 
 #define ARENA_SLAB_SIZE 4096
+#define N_OPERATIONS 10000
 
 static void env_info(size_t slab_size, double hashmap_lf, double ohashmap_lf) {
   printf("==========================================\n");
@@ -21,21 +22,6 @@ static size_t bad_hash(const void *key, size_t len) {
   return 0;
 }
 
-static void run_workload(const char *label, void *map,
-                         void (*insert_fn)(void *, int)) {
-  BENCHMARK_FULL(label, 10000, { insert_fn(map, i); });
-}
-
-// wrapper for Chaining
-static void wrap_chaining_put(void *m, int i) {
-  hashmap_put((HashMap *)m, &i, &i);
-}
-
-// wrapper for Open Addressing
-static void wrap_open_put(void *m, int i) {
-  ohashmap_put((OHashMap *)m, &i, &i);
-}
-
 int main() {
   printf("\nRunning: %s...\n", __FILE__);
   env_info((size_t)ARENA_SLAB_SIZE, (double)HASHMAP_LOAD_FACTOR,
@@ -48,18 +34,24 @@ int main() {
   hashmap_init(&chaining, sizeof(int), sizeof(int), &a);
   hashmap_set_functions(&chaining, bad_hash, NULL);
 
-  run_workload("Chaining (100% Collisions)", &chaining, wrap_chaining_put);
+  BENCHMARK_FULL("Chaining Put (100% Collisions)", N_OPERATIONS,
+                 { hashmap_put(&chaining, &i, &i); });
+  BENCHMARK_FULL("Chaining Get (100% Collisions)", N_OPERATIONS,
+                 { hashmap_get(&chaining, &i); });
   hashmap_free(&chaining);
 
-  arena_reset(&a);
   arena_free(&a);
+  arena_reset(&a);
   arena_init(&a, ARENA_SLAB_SIZE);
 
   OHashMap open;
   ohashmap_init(&open, sizeof(int), sizeof(int), &a);
   ohashmap_set_functions(&open, bad_hash, NULL);
 
-  run_workload("Open Addressing (100% Collisions)", &open, wrap_open_put);
+  BENCHMARK_FULL("Open Addressing Put (100% Collisions)", N_OPERATIONS,
+                 { ohashmap_put(&open, &i, &i); });
+  BENCHMARK_FULL("Open Addressing Get (100% Collisions)", N_OPERATIONS,
+                 { ohashmap_get(&open, &i); });
   ohashmap_free(&open);
 
   arena_free(&a);

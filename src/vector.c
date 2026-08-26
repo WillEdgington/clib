@@ -42,8 +42,13 @@ void *vector_get(const Vector *v, size_t index) {
 }
 
 void vector_free(Vector *v) {
+  if (v == NULL) return;
+
   free(v->items);
   v->items = NULL;
+  v->count = 0;
+  v->capacity = 0;
+  v->item_size = 0;
 }
 
 int vector_pop(Vector *v, void *ptr) {

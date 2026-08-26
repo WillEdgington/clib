@@ -32,6 +32,11 @@ static void test_vector_ints() {
                 "Pop should return -1 when vector is empty (error)");
 
   vector_free(&v);
+
+  ASSERT_INT_EQ(v.count, 0, "Vector items count should be reset after vector_free");
+  ASSERT_INT_EQ(v.item_size, 0, "Vector item size metadata should be reset after vector_free");
+  ASSERT_INT_EQ(v.capacity, 0, "Vector capacity should be reset after vector_free");
+  
 }
 
 static void test_vector_strings() {

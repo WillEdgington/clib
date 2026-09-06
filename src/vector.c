@@ -62,6 +62,25 @@ int vector_pop(Vector *v, void *ptr) {
   return 0;
 }
 
+int vector_remove(Vector *v, size_t index, void *ptr) {
+  if (v == NULL || index >= v->count) {
+    return -1;
+  }
+
+  void *item = (char *)v->items + (index * v->item_size);
+
+  if (ptr != NULL)
+    memcpy(ptr, item, v->item_size);
+
+  size_t remaining = v->count - 1 - index;
+  if (remaining > 0) {
+    void *src = (char *)item + v->item_size;
+    memmove(item, src, remaining);
+  }
+  v->count--;
+  return 0;
+}
+
 int vector_iter_next(Iter *iter) {
   Vector *vector = (Vector *)iter->collection;
   if (iter->index >= vector->count) {

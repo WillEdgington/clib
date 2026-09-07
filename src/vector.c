@@ -4,6 +4,11 @@
 #include <stdlib.h>
 #include <string.h>
 
+static void *get_item_unguarded(const Vector *v, size_t index) {
+  // use char as a reference to a single byte
+  return (char *)v->items + (index * v->item_size);
+}
+
 static int grow(Vector *v) {
   v->capacity <<= 1;
   void *tmp = realloc(v->items, v->capacity * v->item_size);
@@ -22,23 +27,20 @@ int vector_init(Vector *v, size_t item_size) {
 }
 
 int vector_push(Vector *v, const void *item) {
-  if (v->count == v->capacity && grow(v) != 0)
+  if (v == NULL || item == NULL || (v->count == v->capacity && grow(v) != 0))
     return -1;
-  v->count++;
-  void *ptr = vector_get(v, v->count - 1);
-  if (ptr == NULL) {
-    v->count--;
-    return -1;
-  }
+
+  void *ptr = get_item_unguarded(v, v->count);
+
   memcpy(ptr, item, v->item_size);
+  v->count++;
   return 0;
 }
 
 void *vector_get(const Vector *v, size_t index) {
-  if (v->count == 0 || index >= v->count)
+  if (v == NULL || v->count == 0 || index >= v->count)
     return NULL;
-  // use char as a reference to a single byte
-  return (char *)v->items + (index * v->item_size);
+  return get_item_unguarded(v, index);
 }
 
 void vector_free(Vector *v) {
@@ -52,13 +54,18 @@ void vector_free(Vector *v) {
 }
 
 int vector_pop(Vector *v, void *ptr) {
-  if (v->count == 0)
+  if (v == NULL || v->count == 0)
     return -1;
-  void *tmp = vector_get(v, v->count - 1);
+  
+  if (ptr != NULL) {
+    void *tmp =  get_item_unguarded(v, v->count - 1);
+    if (tmp == NULL)
+      return -1;
+  
+    memcpy(ptr, tmp, v->item_size);
+  }
+
   v->count--;
-  if (tmp == NULL)
-    return -1;
-  memcpy(ptr, tmp, v->item_size);
   return 0;
 }
 
@@ -88,7 +95,7 @@ int vector_iter_next(Iter *iter) {
     return 1;
   }
   iter->current.value =
-      (char *)vector->items + (iter->index * vector->item_size);
+      get_item_unguarded(vector, iter->index);
   iter->index++;
   return 0;
 }

@@ -82,7 +82,7 @@ int vector_remove(Vector *v, size_t index, void *ptr) {
   size_t remaining = v->count - 1 - index;
   if (remaining > 0) {
     void *src = (char *)item + v->item_size;
-    memmove(item, src, remaining);
+    memmove(item, src, remaining * v->item_size);
   }
   v->count--;
   return 0;

@@ -19,6 +19,6 @@ void vector_free(Vector *v);
 int vector_pop(Vector *v, void *ptr);
 int vector_remove(Vector *v, size_t index, void *ptr);
 int vector_iter_next(Iter *iter);
-Iter vector_iter(Vector *vector);
+Iter vector_iter(const Vector *vector);
 
 #endif

@@ -179,7 +179,7 @@ int hashmap_iter_next(Iter *iter) {
   return 1;
 }
 
-Iter hashmap_iter(HashMap *map) {
+Iter hashmap_iter(const HashMap *map) {
   return (Iter){
       .collection = map, .index = 0, .state = NULL, .next = hashmap_iter_next};
 }

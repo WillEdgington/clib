@@ -20,6 +20,6 @@ int heap_pop(Heap *h, void *ptr);
 void *heap_peek(Heap *h);
 void heap_heapify(Heap *h, Vector *data);
 int heap_iter_next(Iter *iter);
-Iter heap_iter(Heap *heap);
+Iter heap_iter(const Heap *heap);
 
 #endif

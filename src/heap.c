@@ -115,4 +115,4 @@ void heap_heapify(Heap *h, Vector *data) {
 
 int heap_iter_next(Iter *iter) { return vector_iter_next(iter); }
 
-Iter heap_iter(Heap *heap) { return vector_iter(&heap->data); }
+Iter heap_iter(const Heap *heap) { return vector_iter(&heap->data); }

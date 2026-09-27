@@ -35,6 +35,6 @@ int hashmap_remove(HashMap *map, const void *key);
 size_t hashmap_count(const HashMap *map);
 void hashmap_free(HashMap *map);
 int hashmap_iter_next(Iter *iter);
-Iter hashmap_iter(HashMap *map);
+Iter hashmap_iter(const HashMap *map);
 
 #endif

@@ -9,7 +9,7 @@ typedef struct {
 } IterResult;
 
 typedef struct Iter {
-  void *collection;
+  const void *collection;
   size_t index;
   void *state;
   IterResult current;

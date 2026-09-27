@@ -147,6 +147,6 @@ int ohashmap_iter_next(Iter *iter) {
   return 1;
 }
 
-Iter ohashmap_iter(OHashMap *map) {
+Iter ohashmap_iter(const OHashMap *map) {
   return (Iter){.collection = map, .index = 0, .next = ohashmap_iter_next};
 }

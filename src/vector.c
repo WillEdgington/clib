@@ -100,6 +100,6 @@ int vector_iter_next(Iter *iter) {
   return 0;
 }
 
-Iter vector_iter(Vector *vector) {
+Iter vector_iter(const Vector *vector) {
   return (Iter){.collection = vector, .index = 0, .next = vector_iter_next};
 }

@@ -1,6 +1,7 @@
 #include "../include/clib/arena.h"
 
 #include <stdlib.h>
+#include <string.h>
 
 static Region *region_create(size_t capacity) {
   Region *r = malloc(sizeof(Region) + capacity);
@@ -61,6 +62,5 @@ void arena_free(Arena *a) {
     free(node);
     node = next_node;
   }
-  a->head = NULL;
-  a->current = NULL;
+  memset(a, 0, sizeof(Arena));
 }

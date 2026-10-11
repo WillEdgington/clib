@@ -150,8 +150,11 @@ int hashmap_remove(HashMap *map, const void *key) {
 size_t hashmap_count(const HashMap *map) { return map->count; }
 
 void hashmap_free(HashMap *map) {
+  if (map == NULL)
+    return;
+
   free(map->buckets);
-  map->buckets = NULL;
+  memset(map, 0, sizeof(HashMap));
 }
 
 int hashmap_iter_next(Iter *iter) {

@@ -128,8 +128,11 @@ int ohashmap_remove(OHashMap *map, const void *key) {
 size_t ohashmap_count(const OHashMap *map) { return map->count; }
 
 void ohashmap_free(OHashMap *map) {
+  if (map == NULL)
+    return;
+
   free(map->buckets);
-  map->buckets = NULL;
+  memset(map, 0, sizeof(OHashMap));
 }
 
 int ohashmap_iter_next(Iter *iter) {
